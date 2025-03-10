@@ -56,6 +56,3 @@ Final Year Student
 Email: vikashchaurasiya2078@gmail.com
 
 ---
-
-
-Let me know if you want to customize this with **your GitHub repo**, **real screenshots**, or **PDF/CSV export feature**, etc.
