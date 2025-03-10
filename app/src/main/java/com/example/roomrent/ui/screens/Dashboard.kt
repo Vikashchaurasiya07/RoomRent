@@ -54,7 +54,7 @@ fun Dashboard(navController: NavController) {
                 .border(2.dp, Color.DarkGray, RoundedCornerShape(25.dp))
                 .background(
                     brush = Brush.horizontalGradient(
-                        colors = listOf(Color(0xFF2196F3), Color(0xFF42A5F5))
+                        colors = listOf(Color(0x0271AAF1), Color(0x2059A9E8))
                     ),
                     shape = RoundedCornerShape(25.dp)
                 )
@@ -64,7 +64,7 @@ fun Dashboard(navController: NavController) {
             Text(
                 text = "Room Rent Manager",
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = Color.Black,
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge
             )
