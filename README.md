@@ -50,9 +50,9 @@ An Android app to manage room rent details using **Jetpack Compose** and **Room 
 ---
 
 ## 📸 Screenshots
-![WhatsApp Image 2025-03-11 at 12 36 45 AM (2)](https://github.com/user-attachments/assets/a845fe6c-5838-4b9a-9b90-2617fcfa13ca)
-![WhatsApp Image 2025-03-11 at 12 36 46 AM (1)](https://github.com/user-attachments/assets/13914b95-097d-447f-8f2a-c4692edd4e2d)
-![WhatsApp Image 2025-03-11 at 12 36 45 AM (3)](https://github.com/user-attachments/assets/3c48fca4-b479-459a-869d-9ffd8e4ba5ca)
+https://github.com/user-attachments/assets/a845fe6c-5838-4b9a-9b90-2617fcfa13ca
+https://github.com/user-attachments/assets/13914b95-097d-447f-8f2a-c4692edd4e2d
+https://github.com/user-attachments/assets/3c48fca4-b479-459a-869d-9ffd8e4ba5ca
 
 
 ---
