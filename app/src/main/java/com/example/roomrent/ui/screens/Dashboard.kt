@@ -1,32 +1,14 @@
-// Your existing imports...
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.material3.CardDefaults.elevatedCardElevation
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -35,11 +17,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.roomrent.data.RoomEntity
+import com.example.roomrent.viewmodel.RoomViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun Dashboard(navController: NavController) {
     val context = LocalContext.current
+    val viewModel: RoomViewModel = viewModel()
+    val roomDataList by viewModel.roomData.collectAsStateWithLifecycle(emptyList())
 
     val roomNo = remember { mutableStateOf("") }
     val roomRent = remember { mutableStateOf("") }
@@ -48,8 +36,6 @@ fun Dashboard(navController: NavController) {
 
     val totalAmount = remember { mutableStateOf(0) }
     val remainingBalance = remember { mutableStateOf(0) }
-
-    val roomDataMap = remember { mutableStateMapOf<String, MutableList<RoomData>>() }
 
     val showDialog = remember { mutableStateOf(false) }
     val selectedRoom = remember { mutableStateOf("") }
@@ -91,13 +77,13 @@ fun Dashboard(navController: NavController) {
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(8.dp)
+            elevation = elevatedCardElevation(8.dp)
         ) {
             Column(modifier = Modifier.padding(24.dp)) {
-                InputField("Room No", roomNo.value) { roomNo.value = it }
-                InputField("Room Rent", roomRent.value) { roomRent.value = it }
-                InputField("Electricity Bill", electricityBill.value) { electricityBill.value = it }
-                InputField("Amount Paid", amountPaid.value) { amountPaid.value = it }
+                InputField("Room No", roomNo.value) { input -> roomNo.value = input }
+                InputField("Room Rent", roomRent.value) { input -> roomRent.value = input }
+                InputField("Electricity Bill", electricityBill.value) { input -> electricityBill.value = input }
+                InputField("Amount Paid", amountPaid.value) { input -> amountPaid.value = input }
 
                 Text(
                     text = "Total: ₹${totalAmount.value}",
@@ -120,12 +106,16 @@ fun Dashboard(navController: NavController) {
                         val bill = electricityBill.value.toIntOrNull() ?: 0
                         val paid = amountPaid.value.toIntOrNull() ?: 0
 
-                        val previousBalance = roomDataMap[roomNo.value]?.lastOrNull()?.balance ?: 0
+                        val previousBalance = roomDataList
+                            .filter { data -> data.roomNo == roomNo.value }
+                            .maxByOrNull { data -> data.id ?: 0 }
+                            ?.balance ?: 0
 
                         totalAmount.value = rent + bill + previousBalance
                         remainingBalance.value = totalAmount.value - paid
 
-                        val data = RoomData(
+                        val entity = RoomEntity(
+                            roomNo = roomNo.value,
                             month = getCurrentMonth(),
                             roomRent = rent,
                             electricityBill = bill,
@@ -133,17 +123,18 @@ fun Dashboard(navController: NavController) {
                             amountPaid = paid,
                             balance = remainingBalance.value
                         )
-                        roomDataMap.getOrPut(roomNo.value) { mutableListOf() }.add(data)
+
+                        viewModel.insertRoomData(entity)
 
                         Toast.makeText(context, "Data saved", Toast.LENGTH_SHORT).show()
 
-                        // Reset fields (except totalAmount and remainingBalance)
                         roomRent.value = ""
                         electricityBill.value = ""
                         amountPaid.value = ""
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors()
                 ) {
                     Text(text = "Calculate & Save", fontWeight = FontWeight.Bold)
                 }
@@ -151,11 +142,10 @@ fun Dashboard(navController: NavController) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Button(
-                    onClick = {
-                        showDialog.value = true
-                    },
+                    onClick = { showDialog.value = true },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors()
                 ) {
                     Text("View Previous Data")
                 }
@@ -169,7 +159,8 @@ fun Dashboard(navController: NavController) {
             title = { Text("Select Room No", fontWeight = FontWeight.Bold) },
             text = {
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    roomDataMap.keys
+                    roomDataList.map { it.roomNo }
+                        .distinct()
                         .sortedBy { it.toIntOrNull() ?: Int.MAX_VALUE }
                         .forEach { room ->
                             Card(
@@ -181,7 +172,7 @@ fun Dashboard(navController: NavController) {
                                         showDialog.value = false
                                     },
                                 shape = RoundedCornerShape(12.dp),
-                                elevation = CardDefaults.cardElevation(4.dp)
+                                elevation = elevatedCardElevation(4.dp)
                             ) {
                                 Box(modifier = Modifier.padding(16.dp)) {
                                     Text(text = "Room $room", fontWeight = FontWeight.Medium)
@@ -199,18 +190,18 @@ fun Dashboard(navController: NavController) {
             onDismissRequest = { selectedRoom.value = "" },
             title = { Text("Bills for Room $room", fontWeight = FontWeight.Bold) },
             text = {
-                val records = roomDataMap[room]
-                if (records.isNullOrEmpty()) {
+                val records = roomDataList.filter { it.roomNo == room }
+                if (records.isEmpty()) {
                     Text("No records found.")
                 } else {
                     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                        records.forEachIndexed { index, record ->
+                        records.forEach { record ->
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(vertical = 4.dp),
                                 shape = RoundedCornerShape(12.dp),
-                                elevation = CardDefaults.cardElevation(2.dp)
+                                elevation = elevatedCardElevation(2.dp)
                             ) {
                                 Column(modifier = Modifier.padding(12.dp)) {
                                     Text("Month: ${record.month}")
@@ -223,15 +214,11 @@ fun Dashboard(navController: NavController) {
                                     Row(horizontalArrangement = Arrangement.End) {
                                         Button(
                                             onClick = {
-                                                roomDataMap[room]?.removeAt(index)
-                                                if (roomDataMap[room].isNullOrEmpty()) {
-                                                    roomDataMap.remove(room)
-                                                    selectedRoom.value = ""
-                                                }
+                                                viewModel.deleteRoomData(record)
                                             },
-                                            colors = ButtonDefaults.buttonColors(Color.Red)
+                                            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
                                         ) {
-                                            Text("Delete")
+                                            Text("Delete", color = Color.White)
                                         }
                                     }
                                 }
@@ -241,13 +228,13 @@ fun Dashboard(navController: NavController) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(
                             onClick = {
-                                roomDataMap.remove(room)
+                                records.forEach { viewModel.deleteRoomData(it) }
                                 selectedRoom.value = ""
                             },
-                            colors = ButtonDefaults.buttonColors(Color.Red),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("Delete All Records")
+                            Text("Delete All Records", color = Color.White)
                         }
                     }
                 }
@@ -272,15 +259,6 @@ fun InputField(label: String, value: String, onValueChange: (String) -> Unit) {
         Spacer(modifier = Modifier.height(12.dp))
     }
 }
-
-data class RoomData(
-    val month: String,
-    val roomRent: Int,
-    val electricityBill: Int,
-    val total: Int,
-    val amountPaid: Int,
-    val balance: Int
-)
 
 fun getCurrentMonth(): String {
     val months = listOf(

@@ -12,7 +12,7 @@ import com.example.roomrent.ui.screens.Splashscreen
 fun AppNavigation(navController: NavHostController) {
     NavHost(navController = navController, startDestination = "splash_screen") {
         composable("splash_screen") { Splashscreen(navController) }
-        composable("dashboard") { Dashboard(navController) }
+        composable("Dashboard") { Dashboard(navController) }
     }
 
 }
