@@ -78,8 +78,7 @@ An Android app to manage room rent details using **Jetpack Compose** and **Room 
 ```
 
 ---
-
-https://github.com/Vikashchaurasiya07/RoomRent/commits/RoomRent
+https://github.com/Vikashchaurasiya07/RoomRent/releases/tag/RoomRent
 
 
 ## 👨‍💻 Developed By
