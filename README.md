@@ -55,7 +55,7 @@ An Android app to manage room rent details using **Jetpack Compose** and **Room 
 
 ### ✅ Option 1: Download APK from GitHub
 
-1. Go to the [Releases Section](https://github.com/your-username/room-rent-management/releases)
+1. Go to the [Releases Section][https://github.com/Vikashchaurasiya07/RoomRent/releases/tag/RoomRent]
 2. Download the latest `.apk` file (e.g. `RoomRentApp-v1.0.apk`)
 3. Transfer the APK to your Android phone (if downloaded on PC)
 4. On your phone:
