@@ -1,5 +1,4 @@
 
-```markdown
 # 🏠 Room Rent Management App
 
 An Android app to manage room rent details using **Jetpack Compose** and **Room Database (KSP)**. This app helps in recording monthly rents, calculating balances, viewing historical data, and managing bills efficiently.
@@ -50,7 +49,6 @@ An Android app to manage room rent details using **Jetpack Compose** and **Room 
 ---
 
 
-```markdown
 ## 📥 How to Download and Install the App
 
 ### ✅ Option 1: Download APK from GitHub
